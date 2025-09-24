@@ -1,3 +1,6 @@
+
+'use client'
+
 import { AppShell } from '@/components/app-shell';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Bluetooth, Droplets, Activity, Info, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Link from 'next/link';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer } from 'recharts';
 
 type BiomarkerStatus = 'Normal' | 'At Risk' | 'Needs Attention';
 
@@ -26,7 +31,7 @@ const biomarkerData = [
     info: 'Measures the amount of sugar in your blood.',
     icon: Activity,
     color: 'text-orange-600',
-    bgColor: 'bg-orange-100 dark:bg-orange-900/50',
+bgColor: 'bg-orange-100 dark:bg-orange-900/50',
   },
   {
     name: 'CRP',
@@ -45,6 +50,29 @@ const recentTests = [
     { date: '2023-10-12', hb: '11.9', glucose: '125', crp: '4.2', status: 'Needs Attention' },
     { date: '2023-10-05', hb: '13.2', glucose: '95', crp: '0.9', status: 'Normal' },
 ];
+
+const chartData = recentTests.map(test => ({
+    date: new Date(test.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    Hemoglobin: parseFloat(test.hb),
+    Glucose: parseFloat(test.glucose),
+    CRP: parseFloat(test.crp)
+})).reverse();
+
+
+const chartConfig = {
+  Hemoglobin: {
+    label: "Hemoglobin (g/dL)",
+    color: "hsl(var(--chart-1))",
+  },
+  Glucose: {
+    label: "Glucose (mg/dL)",
+    color: "hsl(var(--chart-2))",
+  },
+  CRP: {
+    label: "CRP (mg/L)",
+    color: "hsl(var(--chart-3))",
+  },
+} satisfies ChartConfig
 
 const statusStyles: Record<BiomarkerStatus, string> = {
     'Normal': 'bg-green-500',
@@ -101,6 +129,31 @@ export default function DashboardPage() {
                         </div>
                     </CardContent>
                 </Card>
+                
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Biomarker Trends</CardTitle>
+                        <CardDescription>Visualize your biomarker changes over time.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+                            <ResponsiveContainer width="100%" height={300}>
+                                <LineChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                    <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
+                                    <YAxis yAxisId="left" orientation="left" stroke="hsl(var(--chart-1))" hide />
+                                    <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--chart-2))" hide />
+                                    <YAxis yAxisId="crp" orientation="right" stroke="hsl(var(--chart-3))" hide />
+                                    <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
+                                    <Legend />
+                                    <Line yAxisId="left" type="monotone" dataKey="Hemoglobin" stroke="var(--color-Hemoglobin)" strokeWidth={2} dot={false} />
+                                    <Line yAxisId="right" type="monotone" dataKey="Glucose" stroke="var(--color-Glucose)" strokeWidth={2} dot={false} />
+                                    <Line yAxisId="crp" type="monotone" dataKey="CRP" stroke="var(--color-CRP)" strokeWidth={2} dot={false} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </ChartContainer>
+                    </CardContent>
+                </Card>
 
                 <Card>
                     <CardHeader>
@@ -148,3 +201,5 @@ export default function DashboardPage() {
         </AppShell>
     );
 }
+
+    

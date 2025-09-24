@@ -51,6 +51,9 @@ const mockInput: HealthRecommendationsInput = {
   dizzinessLevel: 4,
   paleSkinOrNails: 5,
   shortnessOfBreath: 3,
+  polydipsia: 6,
+  polyuria: 4,
+  polyphagia: 5,
   hemoglobin: 11.2, // From results page
   glucose: 95, // From results page
   crp: 5.1, // From results page
@@ -226,8 +229,11 @@ export default function RecommendationsPage() {
             </CardDescription>
           </CardHeader>
         </Card>
+        
+        <Suspense fallback={<RecommendationsSkeleton />}>
+          <RecommendationsContent />
+        </Suspense>
 
-        <RecommendationsContent />
 
         <Card className="mt-8">
           <CardHeader>
@@ -248,3 +254,5 @@ export default function RecommendationsPage() {
     </AppShell>
   );
 }
+
+    

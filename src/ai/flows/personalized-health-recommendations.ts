@@ -28,6 +28,9 @@ const HealthRecommendationsInputSchema = z.object({
   dizzinessLevel: z.number().min(1).max(10).describe('Dizziness level on a scale of 1 to 10.'),
   paleSkinOrNails: z.number().min(1).max(10).describe('Pale skin or nails level on a scale of 1 to 10.'),
   shortnessOfBreath: z.number().min(1).max(10).describe('Shortness of breath level on a scale of 1 to 10.'),
+  polyuria: z.number().min(1).max(10).describe('Frequent urination (polyuria) level on a scale of 1 to 10.'),
+  polydipsia: z.number().min(1).max(10).describe('Frequent thirst (polydipsia) level on a scale of 1 to 10.'),
+  polyphagia: z.number().min(1).max(10).describe('Frequent hunger (polyphagia) level on a scale of 1 to 10.'),
   hemoglobin: z.number().describe('Hemoglobin level of the user.'),
   glucose: z.number().describe('Glucose level of the user.'),
   crp: z.number().describe('CRP level of the user.'),
@@ -86,6 +89,9 @@ const prompt = ai.definePrompt({
   - Dizziness Level (1-10): {{{dizzinessLevel}}}
   - Pale Skin or Nails (1-10): {{{paleSkinOrNails}}}
   - Shortness of Breath (1-10): {{{shortnessOfBreath}}}
+  - Frequent Thirst (1-10): {{{polydipsia}}}
+  - Frequent Urination (1-10): {{{polyuria}}}
+  - Frequent Hunger (1-10): {{{polyphagia}}}
 
   Test Results:
   - Hemoglobin: {{{hemoglobin}}} g/dL
@@ -109,3 +115,5 @@ const generateHealthRecommendationsFlow = ai.defineFlow(
     return output!;
   }
 );
+
+    

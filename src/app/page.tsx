@@ -44,6 +44,9 @@ const formSchema = z.object({
   dizzinessLevel: z.number().min(1).max(10).default(5),
   paleSkinOrNails: z.number().min(1).max(10).default(5),
   shortnessOfBreath: z.number().min(1).max(10).default(5),
+  polyuria: z.number().min(1).max(10).default(1), // Frequent urination
+  polydipsia: z.number().min(1).max(10).default(1), // Frequent thirst
+  polyphagia: z.number().min(1).max(10).default(1), // Frequent hunger
   medicalHistory: z.string().optional(),
 });
 
@@ -72,6 +75,9 @@ export default function RegistrationPage() {
       dizzinessLevel: 5,
       paleSkinOrNails: 5,
       shortnessOfBreath: 5,
+      polyuria: 1,
+      polydipsia: 1,
+      polyphagia: 1,
       medicalHistory: '',
     },
   });
@@ -398,6 +404,25 @@ export default function RegistrationPage() {
                             <FormControl><Slider min={1} max={10} step={1} defaultValue={[field.value]} onValueChange={(vals) => field.onChange(vals[0])} /></FormControl>
                         </FormItem>
                     )} />
+                    <Separator />
+                    <FormField control={form.control} name="polydipsia" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Frequent Thirst (Polydipsia): {field.value}</FormLabel>
+                            <FormControl><Slider min={1} max={10} step={1} defaultValue={[field.value]} onValueChange={(vals) => field.onChange(vals[0])} /></FormControl>
+                        </FormItem>
+                    )} />
+                    <FormField control={form.control} name="polyuria" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Frequent Urination (Polyuria): {field.value}</FormLabel>
+                            <FormControl><Slider min={1} max={10} step={1} defaultValue={[field.value]} onValueChange={(vals) => field.onChange(vals[0])} /></FormControl>
+                        </FormItem>
+                    )} />
+                    <FormField control={form.control} name="polyphagia" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Frequent Hunger (Polyphagia): {field.value}</FormLabel>
+                            <FormControl><Slider min={1} max={10} step={1} defaultValue={[field.value]} onValueChange={(vals) => field.onChange(vals[0])} /></FormControl>
+                        </FormItem>
+                    )} />
                   </div>
                 </section>
 
@@ -418,3 +443,5 @@ export default function RegistrationPage() {
     </div>
   );
 }
+
+    
