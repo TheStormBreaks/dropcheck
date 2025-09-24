@@ -5,13 +5,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const downloadPdf = async (elementId: string, fileName: string) => {
+export const downloadPdf = async (element: HTMLElement | string, fileName: string) => {
   const jsPDF = (await import('jspdf')).default;
   const html2canvas = (await import('html2canvas')).default;
 
-  const input = document.getElementById(elementId);
+  const input = typeof element === 'string' ? document.getElementById(element) : element;
+  
   if (input) {
-    return html2canvas(input, { scale: 2 }).then(canvas => {
+    return html2canvas(input, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff' }).then(canvas => {
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
