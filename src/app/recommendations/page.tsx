@@ -35,8 +35,6 @@ import {
 } from '@/components/ui/accordion';
 import { useAppContext } from '@/context/app-context';
 import Link from 'next/link';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { downloadPdf } from '@/lib/utils';
 
 type RecommendationCardProps = {
@@ -98,8 +96,8 @@ function RecommendationCard({
 }
 
 function RecommendationsContent() {
-  const { userProfile, testHistory } = useAppContext();
-  const [recommendations, setRecommendations] = useState<HealthRecommendationsOutput | null>(null);
+  const { userProfile, testHistory, recommendations, storeRecommendations } = useAppContext();
+  const [localRecommendations, setLocalRecommendations] = useState<HealthRecommendationsOutput | null>(null);
   const [loading, setLoading] = useState(true);
   
   const latestTest = testHistory.length > 0 ? testHistory[0] : null;
@@ -136,15 +134,24 @@ function RecommendationsContent() {
 
   useEffect(() => {
     async function fetchRecommendations() {
-      if (!recommendationInput) {
+      if (!latestTest || !recommendationInput) {
         setLoading(false);
-        return
-      };
+        return;
+      }
+      
+      const existingRecs = recommendations[latestTest.id];
+
+      if (existingRecs) {
+        setLocalRecommendations(existingRecs);
+        setLoading(false);
+        return;
+      }
       
       try {
         setLoading(true);
         const result = await generateHealthRecommendations(recommendationInput);
-        setRecommendations(result);
+        storeRecommendations(latestTest.id, result);
+        setLocalRecommendations(result);
       } catch (error) {
         console.error('Failed to fetch recommendations:', error);
       } finally {
@@ -152,7 +159,7 @@ function RecommendationsContent() {
       }
     }
     fetchRecommendations();
-  }, [recommendationInput]);
+  }, [recommendationInput, latestTest, recommendations, storeRecommendations]);
   
   if (!userProfile || !latestTest) {
     return (
@@ -173,7 +180,7 @@ function RecommendationsContent() {
     return <RecommendationsSkeleton />;
   }
 
-  if (!recommendations) {
+  if (!localRecommendations) {
     return (
       <Card>
         <CardHeader>
@@ -190,19 +197,19 @@ function RecommendationsContent() {
     {
       title: 'Diet Advice',
       icon: Utensils,
-      data: recommendations.dietAdvice,
+      data: localRecommendations.dietAdvice,
       image: PlaceHolderImages.find(img => img.id === 'diet-advice'),
     },
     {
       title: 'Exercise Routine',
       icon: Dumbbell,
-      data: recommendations.exerciseRoutine,
+      data: localRecommendations.exerciseRoutine,
       image: PlaceHolderImages.find(img => img.id === 'exercise-routine'),
     },
     {
       title: 'Lifestyle Tips',
       icon: HeartPulse,
-      data: recommendations.lifestyleTips,
+      data: localRecommendations.lifestyleTips,
       image: PlaceHolderImages.find(img => img.id === 'lifestyle-tips'),
     },
   ];

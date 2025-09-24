@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { FormValues as UserProfile } from '@/app/page';
+import type { HealthRecommendationsOutput } from '@/ai/flows/personalized-health-recommendations';
 
 export type TestResult = {
     id: string;
@@ -13,12 +14,18 @@ export type TestResult = {
 
 export type BiomarkerStatus = 'Normal' | 'At Risk' | 'Needs Attention';
 
+type StoredRecommendations = {
+    [testId: string]: HealthRecommendationsOutput;
+}
+
 type AppState = {
     userProfile: UserProfile | null;
     testHistory: TestResult[];
+    recommendations: StoredRecommendations;
     addTestResult: (result: Omit<TestResult, 'id' | 'date'>) => void;
     setUserProfile: (profile: UserProfile) => void;
     getBiomarkerStatus: (biomarker: keyof Omit<TestResult, 'id' | 'date'>, value: number) => BiomarkerStatus;
+    storeRecommendations: (testId: string, data: HealthRecommendationsOutput) => void;
 };
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -54,6 +61,7 @@ const initialTestHistory: TestResult[] = [
 export const AppProvider = ({ children }: { children: ReactNode }) => {
     const [userProfile, setUserProfileState] = useState<UserProfile | null>(null);
     const [testHistory, setTestHistory] = useState<TestResult[]>(initialTestHistory);
+    const [recommendations, setRecommendations] = useState<StoredRecommendations>({});
 
     useEffect(() => {
         try {
@@ -66,6 +74,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
                 setTestHistory(JSON.parse(storedHistory));
             } else {
                 setTestHistory(initialTestHistory)
+            }
+            const storedRecs = localStorage.getItem('recommendations');
+            if (storedRecs) {
+                setRecommendations(JSON.parse(storedRecs));
             }
         } catch (error) {
             console.error("Failed to parse from localStorage", error);
@@ -88,8 +100,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem('testHistory', JSON.stringify(updatedHistory));
     };
 
+    const storeRecommendations = (testId: string, data: HealthRecommendationsOutput) => {
+        const newRecommendations = { ...recommendations, [testId]: data };
+        setRecommendations(newRecommendations);
+        localStorage.setItem('recommendations', JSON.stringify(newRecommendations));
+    };
+
     return (
-        <AppContext.Provider value={{ userProfile, testHistory, addTestResult, setUserProfile, getBiomarkerStatus }}>
+        <AppContext.Provider value={{ userProfile, testHistory, addTestResult, setUserProfile, getBiomarkerStatus, recommendations, storeRecommendations }}>
             {children}
         </AppContext.Provider>
     );
