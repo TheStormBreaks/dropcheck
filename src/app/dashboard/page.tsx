@@ -19,7 +19,7 @@ const biomarkerData = [
     name: 'Hemoglobin',
     value: '13.5 g/dL',
     status: 'Normal' as BiomarkerStatus,
-    info: 'Measures the oxygen-carrying protein in your red blood cells.',
+    info: 'Measures the oxygen-carrying protein in your red blood cells. Normal range: 12.0 - 15.5 g/dL.',
     icon: Droplets,
     color: 'text-green-600',
     bgColor: 'bg-green-100 dark:bg-green-900/50',
@@ -28,16 +28,16 @@ const biomarkerData = [
     name: 'Glucose',
     value: '115 mg/dL',
     status: 'At Risk' as BiomarkerStatus,
-    info: 'Measures the amount of sugar in your blood.',
+    info: 'Measures the amount of sugar in your blood. Normal range: 70 - 99 mg/dL.',
     icon: Activity,
     color: 'text-orange-600',
-bgColor: 'bg-orange-100 dark:bg-orange-900/50',
+    bgColor: 'bg-orange-100 dark:bg-orange-900/50',
   },
   {
     name: 'CRP',
     value: '4.2 mg/L',
     status: 'Needs Attention' as BiomarkerStatus,
-    info: 'C-Reactive Protein, a marker for inflammation in the body.',
+    info: 'C-Reactive Protein, a marker for inflammation in the body. Normal range: < 3.0 mg/L.',
     icon: AlertTriangle,
     color: 'text-red-600',
     bgColor: 'bg-red-100 dark:bg-red-900/50',
@@ -50,6 +50,12 @@ const recentTests = [
     { date: '2023-10-12', hb: '11.9', glucose: '125', crp: '4.2', status: 'Needs Attention' },
     { date: '2023-10-05', hb: '13.2', glucose: '95', crp: '0.9', status: 'Normal' },
 ];
+
+const referenceRanges = {
+  hb: '12.0 - 15.5 g/dL',
+  glucose: '70 - 99 mg/dL',
+  crp: '< 3.0 mg/L'
+};
 
 const chartData = recentTests.map(test => ({
     date: new Date(test.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -168,6 +174,7 @@ export default function DashboardPage() {
                                     <TableHead>Hemoglobin</TableHead>
                                     <TableHead>Glucose</TableHead>
                                     <TableHead>CRP</TableHead>
+                                    <TableHead>Reference Range</TableHead>
                                     <TableHead>Status</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -178,6 +185,13 @@ export default function DashboardPage() {
                                         <TableCell>{test.hb} g/dL</TableCell>
                                         <TableCell>{test.glucose} mg/dL</TableCell>
                                         <TableCell>{test.crp} mg/L</TableCell>
+                                        <TableCell>
+                                            <div className="flex flex-col">
+                                                <span>Hb: {referenceRanges.hb}</span>
+                                                <span>Glu: {referenceRanges.glucose}</span>
+                                                <span>CRP: {referenceRanges.crp}</span>
+                                            </div>
+                                        </TableCell>
                                         <TableCell>
                                             <Badge variant={
                                                 test.status === 'Normal' ? 'secondary' : test.status === 'At Risk' ? 'default' : 'destructive'
