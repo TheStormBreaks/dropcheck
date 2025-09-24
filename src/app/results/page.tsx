@@ -128,7 +128,7 @@ export default function ResultsPage() {
                             <p className="text-center text-muted-foreground">
                                 {overallStatus === 'Normal' && 'Your results are within the normal range.'}
                                 {overallStatus === 'At Risk' && 'Some of your results are borderline. We recommend monitoring your health closely.'}
-                                {overallestatus === 'Needs Attention' && 'Some results are outside the normal range. Please consult a healthcare professional.'}
+                                {overallStatus === 'Needs Attention' && 'Some results are outside the normal range. Please consult a healthcare professional.'}
                             </p>
                         </CardContent>
                     </Card>
