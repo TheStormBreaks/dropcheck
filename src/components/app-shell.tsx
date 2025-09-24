@@ -53,26 +53,22 @@ export function AppShell({ children, title }: AppShellProps) {
           <SidebarMenu>
             {navItems.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <Link href={item.href} legacyBehavior passHref>
-                  <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
-                    <a>
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </Link>
+                <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
+                  <Link href={item.href}>
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </Link>
+                </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
             <Separator className="my-2" />
              <SidebarMenuItem>
-                <Link href="/connect-device" legacyBehavior passHref>
-                    <SidebarMenuButton asChild tooltip="Start New Test">
-                        <a>
-                            <PlusCircle />
-                            <span>New Test</span>
-                        </a>
-                    </SidebarMenuButton>
-                </Link>
+                <SidebarMenuButton asChild tooltip="Start New Test">
+                  <Link href="/connect-device">
+                    <PlusCircle />
+                    <span>New Test</span>
+                  </Link>
+                </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
