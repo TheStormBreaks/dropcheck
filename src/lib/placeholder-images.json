@@ -1,3 +1,46 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "prepare-finger",
+      "description": "A person preparing their finger for a blood test.",
+      "imageUrl": "https://images.unsplash.com/photo-1596887772390-2648c0155278?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxmaW5nZXIlMjBsYW5jZXR8ZW58MHx8fHwxNzU4NjgwOTIzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "finger lancet"
+    },
+    {
+      "id": "fill-cuvette",
+      "description": "A drop of blood being applied to a test strip.",
+      "imageUrl": "https://images.unsplash.com/photo-1605802905116-e35c1dee9082?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxibG9vZCUyMGRyb3B8ZW58MHx8fHwxNzU4NjgwOTIzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "blood drop"
+    },
+    {
+      "id": "insert-strip",
+      "description": "A test strip being inserted into a glucose meter like device.",
+      "imageUrl": "https://images.unsplash.com/photo-1672566954988-d62513f9c198?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxnbHVjb21ldGVyJTIwdGVzdHxlbnwwfHx8fDE3NTg2ODA5MjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "glucometer test"
+    },
+    {
+      "id": "wait-for-reading",
+      "description": "A health device showing a loading or waiting icon.",
+      "imageUrl": "https://images.unsplash.com/photo-1541934593604-ac0c865f3212?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxkZXZpY2UlMjBzY3JlZW58ZW58MHx8fHwxNzU4NjgwOTIzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "device screen"
+    },
+    {
+      "id": "diet-advice",
+      "description": "A vibrant photo of healthy foods like fruits and vegetables.",
+      "imageUrl": "https://images.unsplash.com/photo-1606756790138-261d2b21cd75?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxoZWFsdGh5JTIwZm9vZHxlbnwwfHx8fDE3NTg1ODU0ODR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "healthy food"
+    },
+    {
+      "id": "exercise-routine",
+      "description": "A person engaged in a light exercise like jogging or yoga.",
+      "imageUrl": "https://images.unsplash.com/photo-1626082787732-5f608cf4b91f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxwZXJzb24lMjBleGVyY2lzaW5nfGVufDB8fHx8MTc1ODY0MTk0MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person exercising"
+    },
+    {
+      "id": "lifestyle-tips",
+      "description": "A calming image representing a healthy lifestyle, like a person meditating or a serene landscape.",
+      "imageUrl": "https://images.unsplash.com/photo-1705747894563-f47ca490bca4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxzZXJlbmUlMjBsYW5kc2NhcGV8ZW58MHx8fHwxNzU4NTg4OTM0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "serene landscape"
+    }
+  ]
 }
