@@ -32,9 +32,9 @@
     },
     {
       "id": "exercise-routine",
-      "description": "A person engaged in a light exercise like jogging or yoga.",
-      "imageUrl": "https://images.unsplash.com/photo-1626082787732-5f608cf4b91f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxwZXJzb24lMjBleGVyY2lzaW5nfGVufDB8fHx8MTc1ODY0MTk0MHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "person exercising"
+      "description": "A person engaged in a light exercise like jogging or yoga in a scenic outdoor setting.",
+      "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx5b2dhJTIwb3V0ZG9vcnN8ZW58MHx8fHwxNzU4NzU0MjYwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "outdoor yoga"
     },
     {
       "id": "lifestyle-tips",
