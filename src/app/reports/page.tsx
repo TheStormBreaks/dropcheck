@@ -66,49 +66,54 @@ export default function ReportsPage() {
                             <CardTitle>Test History Reports</CardTitle>
                             <CardDescription>Download or share your past health reports.</CardDescription>
                         </CardHeader>
-                        <CardContent id="test-history-table">
-                             <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Report Date</TableHead>
-                                        <TableHead>Hemoglobin</TableHead>
-                                        <TableHead>Glucose</TableHead>
-                                        <TableHead>CRP</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {testHistory.map((report) => (
-                                        <TableRow key={report.id}>
-                                            <TableCell className="font-medium">{new Date(report.date).toLocaleDateString()}</TableCell>
-                                            <TableCell>{report.hemoglobin} g/dL</TableCell>
-                                            <TableCell>{report.glucose} mg/dL</TableCell>
-                                            <TableCell>{report.crp} mg/L</TableCell>
-                                            <TableCell className="text-right">
-                                                <AlertDialog>
-                                                    <AlertDialogTrigger asChild>
-                                                        <Button variant="ghost" size="icon">
-                                                            <Trash2 className="h-4 w-4 text-destructive" />
-                                                        </Button>
-                                                    </AlertDialogTrigger>
-                                                    <AlertDialogContent>
-                                                        <AlertDialogHeader>
-                                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            This action cannot be undone. This will permanently delete this test result.
-                                                        </AlertDialogDescription>
-                                                        </AlertDialogHeader>
-                                                        <AlertDialogFooter>
-                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                        <AlertDialogAction onClick={() => removeTestResult(report.id)}>Delete</AlertDialogAction>
-                                                        </AlertDialogFooter>
-                                                    </AlertDialogContent>
-                                                </AlertDialog>
-                                            </TableCell>
+                        <CardContent>
+                             <div id="test-history-table">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Report Date</TableHead>
+                                            <TableHead>Hemoglobin</TableHead>
+                                            <TableHead>Glucose</TableHead>
+                                            <TableHead>CRP</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {testHistory.map((report) => (
+                                            <TableRow key={report.id} id={`report-row-${report.id}`}>
+                                                <TableCell className="font-medium">{new Date(report.date).toLocaleDateString()}</TableCell>
+                                                <TableCell>{report.hemoglobin} g/dL</TableCell>
+                                                <TableCell>{report.glucose} mg/dL</TableCell>
+                                                <TableCell>{report.crp} mg/L</TableCell>
+                                                <TableCell className="text-right flex justify-end gap-2">
+                                                    <Button variant="ghost" size="icon" onClick={() => downloadPdf(`report-row-${report.id}`, `DropCheck_Test_${report.date}.pdf`)}>
+                                                        <FileDown className="h-4 w-4" />
+                                                    </Button>
+                                                    <AlertDialog>
+                                                        <AlertDialogTrigger asChild>
+                                                            <Button variant="ghost" size="icon">
+                                                                <Trash2 className="h-4 w-4 text-destructive" />
+                                                            </Button>
+                                                        </AlertDialogTrigger>
+                                                        <AlertDialogContent>
+                                                            <AlertDialogHeader>
+                                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                This action cannot be undone. This will permanently delete this test result.
+                                                            </AlertDialogDescription>
+                                                            </AlertDialogHeader>
+                                                            <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                            <AlertDialogAction onClick={() => removeTestResult(report.id)}>Delete</AlertDialogAction>
+                                                            </AlertDialogFooter>
+                                                        </AlertDialogContent>
+                                                    </AlertDialog>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
