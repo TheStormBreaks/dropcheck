@@ -1,60 +1,77 @@
+'use client'
+
 import { AppShell } from '@/components/app-shell';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { FileDown, Share2, Mail, CheckCircle } from 'lucide-react';
+import { FileDown, Share2, Mail, CheckCircle, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-
-const pastReports = [
-    { date: 'October 2023 Summary', type: 'Monthly', sharedWith: 'dr.smith@clinic.com' },
-    { date: 'Test on 2023-10-26', type: 'Single Test', sharedWith: null },
-    { date: 'September 2023 Summary', type: 'Monthly', sharedWith: 'dr.smith@clinic.com' },
-    { date: 'Test on 2023-09-18', type: 'Single Test', sharedWith: null },
-];
+import { useAppContext } from '@/context/app-context';
+import Link from 'next/link';
 
 export default function ReportsPage() {
+    const { testHistory } = useAppContext();
+
+    if (testHistory.length === 0) {
+        return (
+            <AppShell title="Reports">
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                    <FileText className="h-16 w-16 text-muted-foreground mb-4" />
+                    <h2 className="text-2xl font-semibold mb-2">No Reports Available</h2>
+                    <p className="text-muted-foreground mb-4">You haven't performed any tests yet. Reports will be generated here.</p>
+                    <Link href="/connect-device" passHref>
+                        <Button>Start a New Test</Button>
+                    </Link>
+                 </div>
+            </AppShell>
+        );
+    }
+    
+    // Download all results as a single CSV
+    const handleDownloadCsv = () => {
+        const headers = ["date", "hemoglobin_g_dL", "glucose_mg_dL", "crp_mg_L"];
+        const csvRows = [
+            headers.join(','),
+            ...testHistory.map(row => `${row.date},${row.hemoglobin},${row.glucose},${row.crp}`)
+        ];
+
+        const csvContent = "data:text/csv;charset=utf-8," + csvRows.join('\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "dropcheck_report_history.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    
     return (
         <AppShell title="Reports">
             <div className="grid gap-8 lg:grid-cols-3">
                 <div className="lg:col-span-2">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Generated Reports</CardTitle>
+                            <CardTitle>Test History Reports</CardTitle>
                             <CardDescription>Download or share your past health reports.</CardDescription>
                         </CardHeader>
                         <CardContent>
                              <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Report</TableHead>
-                                        <TableHead>Type</TableHead>
-                                        <TableHead>Shared With</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
+                                        <TableHead>Report Date</TableHead>
+                                        <TableHead>Hemoglobin</TableHead>
+                                        <TableHead>Glucose</TableHead>
+                                        <TableHead>CRP</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {pastReports.map((report) => (
-                                        <TableRow key={report.date}>
-                                            <TableCell className="font-medium">{report.date}</TableCell>
-                                            <TableCell>{report.type}</TableCell>
-                                            <TableCell>
-                                                {report.sharedWith ? (
-                                                    <Badge variant="secondary" className="flex w-fit items-center gap-1">
-                                                        <CheckCircle className="h-3 w-3 text-green-500" /> {report.sharedWith}
-                                                    </Badge>
-                                                ) : (
-                                                    <span className="text-muted-foreground">Not shared</span>
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <Button variant="ghost" size="icon">
-                                                    <FileDown className="h-4 w-4" />
-                                                </Button>
-                                                <Button variant="ghost" size="icon">
-                                                    <Share2 className="h-4 w-4" />
-                                                </Button>
-                                            </TableCell>
+                                    {testHistory.map((report) => (
+                                        <TableRow key={report.id}>
+                                            <TableCell className="font-medium">{new Date(report.date).toLocaleDateString()}</TableCell>
+                                            <TableCell>{report.hemoglobin} g/dL</TableCell>
+                                            <TableCell>{report.glucose} mg/dL</TableCell>
+                                            <TableCell>{report.crp} mg/L</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -65,17 +82,13 @@ export default function ReportsPage() {
                 <div className="space-y-8">
                      <Card>
                         <CardHeader>
-                            <CardTitle>Download Reports</CardTitle>
-                            <CardDescription>Generate and download a new report.</CardDescription>
+                            <CardTitle>Download Full History</CardTitle>
+                            <CardDescription>Get a complete record of all your tests.</CardDescription>
                         </CardHeader>
                         <CardContent className="flex flex-col gap-4">
-                           <Button className="w-full">
+                           <Button variant="secondary" className="w-full" onClick={handleDownloadCsv}>
                                <FileDown className="mr-2 h-4 w-4" />
-                               Download as PDF
-                           </Button>
-                           <Button variant="secondary" className="w-full">
-                               <FileDown className="mr-2 h-4 w-4" />
-                               Download as CSV
+                               Download all as CSV
                            </Button>
                         </CardContent>
                     </Card>
@@ -91,7 +104,7 @@ export default function ReportsPage() {
                            </div>
                            <Button className="w-full">
                                <Share2 className="mr-2 h-4 w-4" />
-                               Share Report
+                               Share Latest Report
                            </Button>
                         </CardContent>
                     </Card>

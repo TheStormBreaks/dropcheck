@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 import { AlertCircle, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useAppContext } from '@/context/app-context';
 
 const steps = [
     {
@@ -36,22 +37,34 @@ const steps = [
 
 export default function TestWorkflowPage() {
     const router = useRouter();
+    const { addTestResult } = useAppContext();
     const [currentStep, setCurrentStep] = useState(0);
     const [error, setError] = useState<string | null>(null);
 
     const progress = ((currentStep + 1) / steps.length) * 100;
     const isLastStep = currentStep === steps.length - 1;
 
+    const generateRandomResult = (min: number, max: number, decimals: number = 1) => {
+      const str = (Math.random() * (max - min) + min).toFixed(decimals);
+      return parseFloat(str);
+    }
+
     useEffect(() => {
         let timer: NodeJS.Timeout;
         if (isLastStep) {
             timer = setTimeout(() => {
-                // Simulate receiving results and redirecting
+                // Simulate receiving results and add to global state
+                const newResult = {
+                  hemoglobin: generateRandomResult(10.0, 16.5),
+                  glucose: generateRandomResult(60, 140, 0),
+                  crp: generateRandomResult(0.1, 12.0),
+                };
+                addTestResult(newResult);
                 router.push('/results');
             }, 3000); // Wait 3 seconds on the last step
         }
         return () => clearTimeout(timer);
-    }, [currentStep, isLastStep, router]);
+    }, [currentStep, isLastStep, router, addTestResult]);
 
     const handleNext = () => {
         if (!isLastStep) {

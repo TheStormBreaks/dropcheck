@@ -18,6 +18,8 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import { Logo } from '@/components/logo';
+import { useAppContext } from '@/context/app-context';
+
 
 const supplementOptions = [
   { id: 'iron', label: 'Iron' },
@@ -50,10 +52,11 @@ const formSchema = z.object({
   medicalHistory: z.string().optional(),
 });
 
-type FormValues = z.infer<typeof formSchema>;
+export type FormValues = z.infer<typeof formSchema>;
 
 export default function RegistrationPage() {
   const router = useRouter();
+  const { setUserProfile } = useAppContext();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<FormValues>({
@@ -88,10 +91,21 @@ export default function RegistrationPage() {
   async function onSubmit(values: FormValues) {
     setIsLoading(true);
     console.log(values);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    // In a real app, you'd save this data and set up an authenticated session.
-    // For now, we'll just navigate to the dashboard.
+    
+    // Convert height to cm and weight to kg if necessary
+    const heightInCm = values.heightUnit === 'in' ? values.height * 2.54 : values.height;
+    const weightInKg = values.weightUnit === 'lbs' ? values.weight * 0.453592 : values.weight;
+
+    const profileData = {
+      ...values,
+      height: heightInCm,
+      weight: weightInKg,
+    };
+
+    setUserProfile(profileData);
+    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    
     router.push('/dashboard');
   }
 
@@ -160,7 +174,7 @@ export default function RegistrationPage() {
                            <FormLabel>Height</FormLabel>
                            <div className="flex items-center gap-2">
                             <FormControl>
-                              <Input type="number" placeholder="e.g. 170" {...field} />
+                              <Input type="number" placeholder="e.g. 170" {...field} value={field.value || ''} />
                             </FormControl>
                             <FormField
                               control={form.control}
@@ -186,7 +200,7 @@ export default function RegistrationPage() {
                            <FormLabel>Weight</FormLabel>
                            <div className="flex items-center gap-2">
                             <FormControl>
-                              <Input type="number" placeholder="e.g. 65" {...field} />
+                              <Input type="number" placeholder="e.g. 65" {...field} value={field.value || ''} />
                             </FormControl>
                             <FormField
                               control={form.control}
@@ -221,7 +235,7 @@ export default function RegistrationPage() {
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>Duration of Periods (days)</FormLabel>
-                                <FormControl><Input type="number" placeholder="e.g. 5" {...field} /></FormControl>
+                                <FormControl><Input type="number" placeholder="e.g. 5" {...field} value={field.value || ''} /></FormControl>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -305,7 +319,7 @@ export default function RegistrationPage() {
                                                     checked={field.value?.includes(item.label)}
                                                     onCheckedChange={(checked) => {
                                                         return checked
-                                                        ? field.onChange([...field.value, item.label])
+                                                        ? field.onChange([...(field.value || []), item.label])
                                                         : field.onChange(field.value?.filter((value) => value !== item.label));
                                                     }}
                                                     />
@@ -443,5 +457,3 @@ export default function RegistrationPage() {
     </div>
   );
 }
-
-    

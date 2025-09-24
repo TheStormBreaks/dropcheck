@@ -1,4 +1,3 @@
-// src/app/recommendations/page.tsx
 'use client';
 
 import {AppShell} from '@/components/app-shell';
@@ -22,10 +21,11 @@ import {
   Download,
   MessageSquareQuote,
   FlaskConical,
+  FileText,
 } from 'lucide-react';
 import {PlaceHolderImages} from '@/lib/placeholder-images';
 import Image from 'next/image';
-import {Suspense, useEffect, useState} from 'react';
+import {Suspense, useEffect, useState, useMemo} from 'react';
 import {Skeleton} from '@/components/ui/skeleton';
 import {
   Accordion,
@@ -33,31 +33,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-
-// In a real app, this data would come from the user's profile and latest test results.
-const mockInput: HealthRecommendationsInput = {
-  age: 34,
-  heightCm: 165,
-  weightKg: 70,
-  gender: 'Female',
-  familyHistory: ['Diabetes'],
-  regularMedications: 'None',
-  durationOfPeriods: 5,
-  severityOfPeriods: 'Moderate',
-  irregularCyclesOrSpotting: false,
-  dietaryPreferences: 'Non-vegetarian',
-  supplementUse: ['iron'],
-  fatigueLevel: 7,
-  dizzinessLevel: 4,
-  paleSkinOrNails: 5,
-  shortnessOfBreath: 3,
-  polydipsia: 6,
-  polyuria: 4,
-  polyphagia: 5,
-  hemoglobin: 11.2, // From results page
-  glucose: 95, // From results page
-  crp: 5.1, // From results page
-};
+import { useAppContext } from '@/context/app-context';
+import Link from 'next/link';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 type RecommendationCardProps = {
   title: string;
@@ -118,15 +97,52 @@ function RecommendationCard({
 }
 
 function RecommendationsContent() {
-  const [recommendations, setRecommendations] =
-    useState<HealthRecommendationsOutput | null>(null);
+  const { userProfile, testHistory } = useAppContext();
+  const [recommendations, setRecommendations] = useState<HealthRecommendationsOutput | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  const latestTest = testHistory.length > 0 ? testHistory[0] : null;
+
+  const recommendationInput: HealthRecommendationsInput | null = useMemo(() => {
+    if (!userProfile || !latestTest) {
+      return null;
+    }
+    return {
+      age: userProfile.age,
+      heightCm: userProfile.height,
+      weightKg: userProfile.weight,
+      gender: userProfile.gender,
+      familyHistory: userProfile.familyHistoryDetails?.split(',').map(s => s.trim()) || [],
+      regularMedications: userProfile.regularMedications || 'None',
+      durationOfPeriods: userProfile.durationOfPeriods,
+      severityOfPeriods: userProfile.severityOfPeriods,
+      irregularCyclesOrSpotting: userProfile.irregularCyclesOrSpotting,
+      dietaryPreferences: userProfile.dietaryPreferences,
+      supplementUse: userProfile.supplementUse,
+      fatigueLevel: userProfile.fatigueLevel,
+      dizzinessLevel: userProfile.dizzinessLevel,
+      paleSkinOrNails: userProfile.paleSkinOrNails,
+      shortnessOfBreath: userProfile.shortnessOfBreath,
+      polydipsia: userProfile.polydipsia,
+      polyuria: userProfile.polyuria,
+      polyphagia: userProfile.polyphagia,
+      hemoglobin: latestTest.hemoglobin,
+      glucose: latestTest.glucose,
+      crp: latestTest.crp,
+    };
+  }, [userProfile, latestTest]);
+
 
   useEffect(() => {
     async function fetchRecommendations() {
+      if (!recommendationInput) {
+        setLoading(false);
+        return
+      };
+      
       try {
         setLoading(true);
-        const result = await generateHealthRecommendations(mockInput);
+        const result = await generateHealthRecommendations(recommendationInput);
         setRecommendations(result);
       } catch (error) {
         console.error('Failed to fetch recommendations:', error);
@@ -135,7 +151,22 @@ function RecommendationsContent() {
       }
     }
     fetchRecommendations();
-  }, []);
+  }, [recommendationInput]);
+  
+  if (!userProfile || !latestTest) {
+    return (
+       <Card>
+        <CardHeader>
+            <CardTitle className="flex items-center gap-2"><FileText /> Insufficient Data</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-4">We need your profile and at least one test result to generate recommendations.</p>
+          {!userProfile && <Link href="/"><Button>Create Profile</Button></Link>}
+          {userProfile && !latestTest && <Link href="/connect-device"><Button>Start a Test</Button></Link>}
+        </CardContent>
+      </Card>
+    )
+  }
 
   if (loading) {
     return <RecommendationsSkeleton />;
@@ -176,7 +207,7 @@ function RecommendationsContent() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div id="pdf-content" className="space-y-8 bg-background">
       {recommendationCards.map(rec => (
         <RecommendationCard key={rec.title} {...rec} />
       ))}
@@ -214,6 +245,35 @@ function RecommendationsSkeleton() {
 }
 
 export default function RecommendationsPage() {
+
+  const handleSavePdf = () => {
+        const input = document.getElementById('pdf-content');
+        if (input) {
+            html2canvas(input, { scale: 2 }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                const canvasWidth = canvas.width;
+                const canvasHeight = canvas.height;
+                const ratio = canvasWidth / canvasHeight;
+                let width = pdfWidth;
+                let height = width / ratio;
+
+                if (height > pdfHeight) {
+                    height = pdfHeight;
+                    width = height * ratio;
+                }
+                
+                const x = (pdfWidth - width) / 2;
+
+                pdf.addImage(imgData, 'PNG', x, 0, width, height);
+                pdf.save(`DropCheck_Recommendations.pdf`);
+            });
+        }
+    };
+
+
   return (
     <AppShell title="Personalized Recommendations">
       <div className="w-full max-w-3xl mx-auto">
@@ -240,7 +300,7 @@ export default function RecommendationsPage() {
             <CardTitle>Actions</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col sm:flex-row gap-4">
-            <Button className="w-full" size="lg">
+            <Button className="w-full" size="lg" onClick={handleSavePdf}>
               <Download className="mr-2 h-4 w-4" />
               Save Recommendations
             </Button>
@@ -254,5 +314,3 @@ export default function RecommendationsPage() {
     </AppShell>
   );
 }
-
-    
