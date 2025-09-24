@@ -34,10 +34,19 @@ const HealthRecommendationsInputSchema = z.object({
 });
 export type HealthRecommendationsInput = z.infer<typeof HealthRecommendationsInputSchema>;
 
+const RecommendationDetailSchema = z.object({
+  introduction: z.string().describe('A brief introduction to the recommendation section.'),
+  recommendations: z.array(z.object({
+    title: z.string().describe('The title of the specific recommendation.'),
+    description: z.string().describe('A detailed description of the recommendation.'),
+  })).describe('A list of specific, actionable recommendations.'),
+  scientificRationale: z.string().describe('The scientific backing or reasoning for the recommendations, citing general health principles or study findings.'),
+});
+
 const HealthRecommendationsOutputSchema = z.object({
-  dietAdvice: z.string().describe('Personalized diet advice based on the user data and test results.'),
-  exerciseRoutine: z.string().describe('Customized exercise routine suggestions based on the user profile.'),
-  lifestyleTips: z.string().describe('General lifestyle tips for improving health.'),
+  dietAdvice: RecommendationDetailSchema.describe('Personalized diet advice based on the user data and test results.'),
+  exerciseRoutine: RecommendationDetailSchema.describe('Customized exercise routine suggestions based on the user profile.'),
+  lifestyleTips: RecommendationDetailSchema.describe('General lifestyle tips for improving health.'),
 });
 export type HealthRecommendationsOutput = z.infer<typeof HealthRecommendationsOutputSchema>;
 
@@ -51,9 +60,9 @@ const prompt = ai.definePrompt({
   name: 'healthRecommendationsPrompt',
   input: {schema: HealthRecommendationsInputSchema},
   output: {schema: HealthRecommendationsOutputSchema},
-  prompt: `You are an AI health assistant that provides personalized health recommendations.
+  prompt: `You are an expert AI health assistant. Your goal is to provide highly detailed, personalized, and scientifically-backed health recommendations.
 
-  Based on the user's health data and test results, provide personalized diet advice, a customized exercise routine, and general lifestyle tips.
+  Analyze the user's health data and test results to generate specific, actionable advice for their diet, exercise, and lifestyle. For each section (Diet, Exercise, Lifestyle), provide an introduction, a list of detailed recommendations, and a summary of the scientific rationale behind your advice. Ground your rationale in established nutritional science, exercise physiology, and public health guidelines.
 
   User Health Data:
   - Age: {{{age}}}
@@ -79,16 +88,14 @@ const prompt = ai.definePrompt({
   - Shortness of Breath (1-10): {{{shortnessOfBreath}}}
 
   Test Results:
-  - Hemoglobin: {{{hemoglobin}}}
-  - Glucose: {{{glucose}}}
-  - CRP: {{{crp}}}
+  - Hemoglobin: {{{hemoglobin}}} g/dL
+  - Glucose: {{{glucose}}} mg/dL
+  - CRP: {{{crp}}} mg/L
 
-  Provide the recommendations in a concise and easy-to-understand manner.
-
-  Output:
-  Diet Advice: ...
-  Exercise Routine: ...
-  Lifestyle Tips: ...`,
+  Structure your output precisely according to the JSON schema. For each recommendation, provide a clear title and a descriptive paragraph.
+  For example, for diet, a recommendation title could be "Increase Iron-Rich Foods" and the description would detail which foods to eat and why.
+  For the scientific rationale, explain *why* these changes are important based on the user's data (e.g., "Given your low hemoglobin and high fatigue, increasing iron intake is crucial for red blood cell production...").
+  `,
 });
 
 const generateHealthRecommendationsFlow = ai.defineFlow(

@@ -17,14 +17,18 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, FileText, Bot, PlusCircle, LogOut, User as UserIcon } from 'lucide-react';
+import { LayoutDashboard, FileText, Bot, PlusCircle, LogOut, User as UserIcon, Moon, Sun, Monitor } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Separator } from './ui/separator';
+import { useTheme } from '@/hooks/use-theme';
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -39,6 +43,7 @@ const navItems = [
 
 export function AppShell({ children, title }: AppShellProps) {
   const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
   
   return (
     <SidebarProvider>
@@ -95,6 +100,25 @@ export function AppShell({ children, title }: AppShellProps) {
                 <UserIcon className="mr-2" />
                 <span>Profile</span>
               </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  {theme === 'light' && <Sun className="mr-2" />}
+                  {theme === 'dark' && <Moon className="mr-2" />}
+                  {theme === 'system' && <Monitor className="mr-2" />}
+                  <span>Theme</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem onClick={() => setTheme('light')}>
+                    <Sun className="mr-2" /> Light
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme('dark')}>
+                    <Moon className="mr-2" /> Dark
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme('system')}>
+                    <Monitor className="mr-2" /> System
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <LogOut className="mr-2" />
