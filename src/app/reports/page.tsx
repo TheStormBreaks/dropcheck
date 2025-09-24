@@ -4,14 +4,26 @@ import { AppShell } from '@/components/app-shell';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { FileDown, Share2, Mail, CheckCircle, FileText } from 'lucide-react';
+import { FileDown, Share2, Mail, CheckCircle, FileText, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useAppContext } from '@/context/app-context';
 import Link from 'next/link';
+import { downloadPdf } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 export default function ReportsPage() {
-    const { testHistory } = useAppContext();
+    const { testHistory, removeTestResult } = useAppContext();
 
     if (testHistory.length === 0) {
         return (
@@ -28,7 +40,6 @@ export default function ReportsPage() {
         );
     }
     
-    // Download all results as a single CSV
     const handleDownloadCsv = () => {
         const headers = ["date", "hemoglobin_g_dL", "glucose_mg_dL", "crp_mg_L"];
         const csvRows = [
@@ -55,7 +66,7 @@ export default function ReportsPage() {
                             <CardTitle>Test History Reports</CardTitle>
                             <CardDescription>Download or share your past health reports.</CardDescription>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent id="test-history-table">
                              <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -63,6 +74,7 @@ export default function ReportsPage() {
                                         <TableHead>Hemoglobin</TableHead>
                                         <TableHead>Glucose</TableHead>
                                         <TableHead>CRP</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -72,6 +84,27 @@ export default function ReportsPage() {
                                             <TableCell>{report.hemoglobin} g/dL</TableCell>
                                             <TableCell>{report.glucose} mg/dL</TableCell>
                                             <TableCell>{report.crp} mg/L</TableCell>
+                                            <TableCell className="text-right">
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button variant="ghost" size="icon">
+                                                            <Trash2 className="h-4 w-4 text-destructive" />
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            This action cannot be undone. This will permanently delete this test result.
+                                                        </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                        <AlertDialogAction onClick={() => removeTestResult(report.id)}>Delete</AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -88,7 +121,11 @@ export default function ReportsPage() {
                         <CardContent className="flex flex-col gap-4">
                            <Button variant="secondary" className="w-full" onClick={handleDownloadCsv}>
                                <FileDown className="mr-2 h-4 w-4" />
-                               Download all as CSV
+                               Download as CSV
+                           </Button>
+                           <Button variant="secondary" className="w-full" onClick={() => downloadPdf('test-history-table', 'DropCheck_Test_History.pdf')}>
+                               <FileDown className="mr-2 h-4 w-4" />
+                               Download as PDF
                            </Button>
                         </CardContent>
                     </Card>

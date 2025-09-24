@@ -23,6 +23,7 @@ type AppState = {
     testHistory: TestResult[];
     recommendations: StoredRecommendations;
     addTestResult: (result: Omit<TestResult, 'id' | 'date'>) => void;
+    removeTestResult: (testId: string) => void;
     setUserProfile: (profile: UserProfile) => void;
     getBiomarkerStatus: (biomarker: keyof Omit<TestResult, 'id' | 'date'>, value: number) => BiomarkerStatus;
     storeRecommendations: (testId: string, data: HealthRecommendationsOutput) => void;
@@ -60,7 +61,7 @@ const initialTestHistory: TestResult[] = [
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
     const [userProfile, setUserProfileState] = useState<UserProfile | null>(null);
-    const [testHistory, setTestHistory] = useState<TestResult[]>(initialTestHistory);
+    const [testHistory, setTestHistory] = useState<TestResult[]>([]);
     const [recommendations, setRecommendations] = useState<StoredRecommendations>({});
 
     useEffect(() => {
@@ -99,6 +100,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         setTestHistory(updatedHistory);
         localStorage.setItem('testHistory', JSON.stringify(updatedHistory));
     };
+    
+    const removeTestResult = (testId: string) => {
+        const updatedHistory = testHistory.filter(test => test.id !== testId);
+        setTestHistory(updatedHistory);
+        localStorage.setItem('testHistory', JSON.stringify(updatedHistory));
+    };
 
     const storeRecommendations = (testId: string, data: HealthRecommendationsOutput) => {
         const newRecommendations = { ...recommendations, [testId]: data };
@@ -107,7 +114,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AppContext.Provider value={{ userProfile, testHistory, addTestResult, setUserProfile, getBiomarkerStatus, recommendations, storeRecommendations }}>
+        <AppContext.Provider value={{ userProfile, testHistory, addTestResult, removeTestResult, setUserProfile, getBiomarkerStatus, recommendations, storeRecommendations }}>
             {children}
         </AppContext.Provider>
     );
