@@ -37,6 +37,7 @@ import { useAppContext } from '@/context/app-context';
 import Link from 'next/link';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { downloadPdf } from '@/lib/utils';
 
 type RecommendationCardProps = {
   title: string;
@@ -245,35 +246,6 @@ function RecommendationsSkeleton() {
 }
 
 export default function RecommendationsPage() {
-
-  const handleSavePdf = () => {
-        const input = document.getElementById('pdf-content');
-        if (input) {
-            html2canvas(input, { scale: 2 }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = pdf.internal.pageSize.getHeight();
-                const canvasWidth = canvas.width;
-                const canvasHeight = canvas.height;
-                const ratio = canvasWidth / canvasHeight;
-                let width = pdfWidth;
-                let height = width / ratio;
-
-                if (height > pdfHeight) {
-                    height = pdfHeight;
-                    width = height * ratio;
-                }
-                
-                const x = (pdfWidth - width) / 2;
-
-                pdf.addImage(imgData, 'PNG', x, 0, width, height);
-                pdf.save(`DropCheck_Recommendations.pdf`);
-            });
-        }
-    };
-
-
   return (
     <AppShell title="Personalized Recommendations">
       <div className="w-full max-w-3xl mx-auto">
@@ -294,13 +266,12 @@ export default function RecommendationsPage() {
           <RecommendationsContent />
         </Suspense>
 
-
         <Card className="mt-8">
           <CardHeader>
             <CardTitle>Actions</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col sm:flex-row gap-4">
-            <Button className="w-full" size="lg" onClick={handleSavePdf}>
+            <Button className="w-full" size="lg" onClick={() => downloadPdf('pdf-content', 'DropCheck_Recommendations.pdf')}>
               <Download className="mr-2 h-4 w-4" />
               Save Recommendations
             </Button>
